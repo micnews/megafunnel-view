@@ -1,0 +1,6 @@
+# megafunnel-query
+
+
+## License
+
+MIT
