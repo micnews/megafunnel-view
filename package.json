@@ -1,11 +1,11 @@
 {
-  "name": "megafunnel-query",
+  "name": "megafunnel-view",
   "description": "simple views on top of megafunnel",
   "version": "0.0.0",
-  "homepage": "https://github.com/micnews/megafunnel-query",
+  "homepage": "https://github.com/micnews/megafunnel-view",
   "repository": {
     "type": "git",
-    "url": "git://github.com/micnews/megafunnel-query.git"
+    "url": "git://github.com/micnews/megafunnel-view.git"
   },
   "dependencies": {
     "level": "~0.18.0",
@@ -13,7 +13,8 @@
     "time-bucket-reduce": "~0.1.1",
     "minimist": "~1.1.0",
     "through": "~2.3.6",
-    "split": "~0.3.0"
+    "split": "~0.3.0",
+    "batchqueue": "~1.0.0"
   },
   "devDependencies": {
     "tape": "~3.0.0"
@@ -21,6 +22,6 @@
   "scripts": {
     "test": "set -e; for t in test/*.js; do node $t; done"
   },
-  "author": "Dominic Tarr <dominic.tarr@gmail.com> (http://dominictarr.com)",
+  "author": "Dominic Tarr <dominictarr@micnews.com> (http://micnews.com)",
   "license": "MIT"
 }
