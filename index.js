@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 var LTBR       = require('level-tbr')
 var hyperquest = require('hyperquest')
 var toPull     = require('stream-to-pull-stream')
