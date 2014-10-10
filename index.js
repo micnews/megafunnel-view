@@ -15,6 +15,7 @@ var stack      = require('stack')
 var route      = require('tiny-route')
 var periods    = require('time-period').periods
 var stringify  = require('pull-stringify')
+var query      = require('./query')
 
 module.exports = function (config) {
   var dbPath = join(config.logDir, 'view-db')
@@ -22,21 +23,45 @@ module.exports = function (config) {
 
   var db = sublevel(level(dbPath, {valueEncoding: 'json'}))
   var tbr = LTBR(db, function (since) {
-    return pull(
-      toPull(hyperquest(url.format({
+    var u = url.format({
         protocol: 'http',
-        host: config.megaHost,
+        hostname: config.megaHost,
         port: config.megaPort,
         pathname: '/query',
         search: qs.encode({gt: since})
-      }))),
+      })
+
+    return pull(
+      toPull(hyperquest(u)),
       split(),
+      pull.filter(function (e) {
+        return e && e.length
+      }),
       pull.map(csvLine.decode)
     )
   })
 
-  //okay what about queries?
-  //should I just have default queries?
+  //load views from the config file.
+  //(TODO, post views via http)
+
+  var views = config.views
+
+  for(var name in views) (function (name) {
+    var v = views[name]
+    if     (v.stats) v = query.stats(q.stats)
+    else if(v.count) v = query.count(v.count)
+    else
+      throw new Error('view may be type "count" or "stats"')
+
+    tbr.addQuery({
+      name   : name,
+      map    : function (data) {
+        console.log('filter', v.filter(data))
+        return v.filter(data)
+      },
+      reduce : v.reduce
+    })
+  })(name)
 
   var qdb = db.sublevel('queries')
 
@@ -45,7 +70,7 @@ module.exports = function (config) {
       var _url = url.parse(req.url)
       var opts = qs.decode(_url.query)
       opts.name = req.params[0]
-      console.log(opts)
+
       try {
         pull(
           tbr.query(opts),
@@ -56,8 +81,15 @@ module.exports = function (config) {
         return next(err)
       }
     })
-
+//    route.post(/^\/(count|sum)\/(\w+)\//, function (req, res, next) {
+//      var type = req.params[0]
+//      var name = req.params[1]
+//      console.log(type, name, req.url)
+//      var line = csvLine.decode(req.url)
+//      res.end('ok')
+//    })
   ))
+
 }
 
 if(!module.parent) {
