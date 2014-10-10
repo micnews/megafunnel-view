@@ -1,7 +1,3 @@
-var level      = require('level')
-var sublevel   = require('level-sublevel/bytewise')
-var mkdirp     = require('mkdirp')
-var join       = require('path').join
 var LTBR       = require('level-tbr')
 var hyperquest = require('hyperquest')
 var toPull     = require('stream-to-pull-stream')
@@ -16,12 +12,12 @@ var route      = require('tiny-route')
 var periods    = require('time-period').periods
 var stringify  = require('pull-stringify')
 var query      = require('./query')
+var createDb   = require('./db')
 
 module.exports = function (config) {
-  var dbPath = join(config.logDir, 'view-db')
-  mkdirp.sync(dbPath)
 
-  var db = sublevel(level(dbPath, {valueEncoding: 'json'}))
+  var db = createDb(config)
+
   var tbr = LTBR(db, function (since) {
     var u = url.format({
         protocol: 'http',
@@ -31,6 +27,7 @@ module.exports = function (config) {
         search: qs.encode({gt: since})
       })
 
+    console.error('GET', u)
     return pull(
       toPull(hyperquest(u)),
       split(),
@@ -55,10 +52,7 @@ module.exports = function (config) {
 
     tbr.addQuery({
       name   : name,
-      map    : function (data) {
-        console.log('filter', v.filter(data))
-        return v.filter(data)
-      },
+      map    : v.filter,
       reduce : v.reduce
     })
   })(name)
@@ -80,6 +74,13 @@ module.exports = function (config) {
       } catch (err) {
         return next(err)
       }
+    }),
+    route.get(/^\/state\/(\w+)/, function (req, res, next) {
+      var name = req.params[0]
+      var query = tbr.queries[name]
+      if(!query)
+        return next(new Error('unknown query:'+name))
+      res.end(JSON.stringify(query.dump(), null, 2) + '\n')
     })
 //    route.post(/^\/(count|sum)\/(\w+)\//, function (req, res, next) {
 //      var type = req.params[0]
