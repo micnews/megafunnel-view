@@ -80,8 +80,19 @@ module.exports = function (config) {
       var query = tbr.queries[name]
       if(!query)
         return next(new Error('unknown query:'+name))
-      res.end(JSON.stringify(query.dump(), null, 2) + '\n')
+      var data = query.dump().filter(function (e) { return e.value != null })
+      res.end(JSON.stringify(data, null, 2) + '\n')
+    }),
+    route.get(/^\/state/, function (req, res, next) {
+      var d = {}
+      for(var name in tbr.queries) {
+        var q = tbr.queries[name]
+        if('function' === typeof q.dump)
+          d[name] = q.dump().filter(function (e) { return e.value != null })
+      }
+      res.end(JSON.stringify(d, null, 2) + '\n')
     })
+
 //    route.post(/^\/(count|sum)\/(\w+)\//, function (req, res, next) {
 //      var type = req.params[0]
 //      var name = req.params[1]
