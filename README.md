@@ -37,7 +37,6 @@ curl "$HOST:$PORT/query/clicks&period=Minutes"
 
 ## http api
 
-
 ### GET /view/{name}?period={Minutes,Hours,Date,FullYear}
 
 period is the only mandatory option. the value must be a valid
@@ -56,6 +55,15 @@ use the option `&lines=true`.
 To get a realtime feed, use `&tail=true`. You can parse streaming json
 with [JSONStream](https://github.com/dominictarr/JSONStream) although using
 line delimited json is more performant.
+
+### GET /state/{name}
+
+Get a snapshot of the current state of this query. This returns the current
+values for each [period](https://github.com/dominictarr/time-period)
+
+### GET /state
+
+get a snapshot for all queries.
 
 ## License
 
