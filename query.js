@@ -129,9 +129,9 @@ if(!module.parent) {
       return reduce.filter(line)
     },
     reduce: reduce.reduce,
-    output: function (value, i, part) {
+    output: function (value, start, part) {
       if(~buckets.indexOf(part.toUpperCase()))
-        console.log('==', value, part)
+        console.log('==', value, start, part)
     }
   })
 
@@ -141,7 +141,7 @@ if(!module.parent) {
 
   var queryStream = opts.buckets
   ? through(function (data) {
-    TBR(data)
+    if(data.length) TBR(data)
   }, function () {
     console.log(TBR.dump())
   })
