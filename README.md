@@ -12,8 +12,10 @@ which is hosted by megafunnel)
 {
   "views": {
     "clicks": {
-      "count":
-    ",click,,,,,,{url},,,,,,,,,,,,"
+      "count": {
+        eventName: 'click',
+        href: true
+      }
     }
   }
 }
