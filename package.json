@@ -21,7 +21,8 @@
     "pull-stream": "~2.26.0",
     "time-period": "~1.1.1",
     "rc": "~0.5.1",
-    "pull-stringify": "~1.1.1"
+    "pull-stringify": "~1.1.1",
+    "condor": "~2.0.0"
   },
   "devDependencies": {
     "tape": "~3.0.0"
