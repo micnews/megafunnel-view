@@ -24,11 +24,11 @@ tape('create count query', function (t) {
 })
 
 tape('create stats query', function (t) {
-  var reduce = q.stats('condor,1.1.0,end,,,,,{duration}')
+  var reduce = q.stats('condor,1.1.0,end,,,,,,{duration}')
 
-  var line = '1411704587915,end,782,757,0,2300,http://url.com/foo,20300,date,240,,,,,,,,,,0'
-  var line1 = '1411704587915,end,782,757,0,2300,http://url.com/foo,16300,date,240,,,,,,,,,,0'
-  var line2 = '1411704587915,end,782,757,0,2300,http://url.com/foo,33300,date,240,,,,,,,,,,0'
+  var line = 'condor,1.1.0,end,782,757,0,2300,http://url.com/foo,20300,date,240,,,,,,,,,,0'
+  var line1 = 'condor,1.1.0,end,782,757,0,2300,http://url.com/foo,16300,date,240,,,,,,,,,,0'
+  var line2 = 'condor,1.1.0,end,782,757,0,2300,http://url.com/foo,33300,date,240,,,,,,,,,,0'
 
   var value = reduce(null, line)
   t.equal(value.mean, 20300)
