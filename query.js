@@ -1,22 +1,23 @@
 var r = require('./reduce')
 var legacy = require('./legacy')
-
-/*
-//count, group by a column.
-{
-  //<filter key>: <literal match>,
-  foo: 'bar'
-  //<target key>: <pattern>
-  match: 'foo{bar}' //matches foobar, foobaz, fooblurg, fooetc.
-}
-
-//
-
-
-*/
+var columns = require('condor/columns.json')
+var csvLine = require('csv-line')
 
 function isString(s) {
   return 'string' === typeof s
+}
+
+function isFunction (f) {
+  return 'function' === typeof f
+}
+
+var cIndex = {}
+
+for(var version in columns) {
+  var v = cIndex[version] = {}
+  columns[version].forEach(function (name, i) {
+    v[name] = i
+  })
 }
 
 function id (value) { return value }
@@ -24,7 +25,7 @@ function id (value) { return value }
 function query (rule) {
 
   if(isString(rule)) return legacy(rule)
-  
+
   var obj = {}
   for(var key in rule) (function (key, value) {
     if(true === value)
@@ -42,16 +43,32 @@ function query (rule) {
   })(key, rule[key])
 
   return function (data) {
+    if('string' === typeof data)
+      data = csvLine.decode(data)
+    var client = data[0]
+    var m = /\d+\.\d+/.exec(data[1])
+
+    //1.1 is last version befor columns where added.
+    var version = m ? m[0] : '1.1'
+    var columns = cIndex[version]
+
+    //can't process version we do not recognise
+    if(!columns) return
+
     var target
     for(var key in rule) {
       var rvalue = rule[key]
-      var value = data[key]
-      if(isString(rvalue)) {
+
+      var value = data[columns[key]]
+      if(rvalue === true)
+        target = value
+      else if(isString(rvalue)) {
         if(rvalue !== value) return
       }
       else if(isFunction(rvalue))
         target = rvalue(value)
     }
+
     return target
   }
 }
