@@ -26,11 +26,11 @@ module.exports = function (string) {
       var l = line.length
       for(var i = 0; i < l; i++) {
         //if a hard coded string does not match, skip this row without changes.
-        if('string' === typeof line[i] && line[i] !== row[i]) {
+        if('string' === typeof line[i] && line[i] !== row[i+1]) {
           return null
         }
         if('function' === typeof line[i]) {
-          return line[i](row[i])
+          return line[i](row[i+1])
         }
       }
       return 1
