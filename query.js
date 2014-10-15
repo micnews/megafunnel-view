@@ -58,8 +58,7 @@ function query (rule) {
     var target
     for(var key in rule) {
       var rvalue = rule[key]
-
-      var value = data[columns[key]]
+      var value = data[columns[key] + 1]
       if(rvalue === true)
         target = value
       else if(isString(rvalue)) {
