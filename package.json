@@ -1,7 +1,7 @@
 {
   "name": "megafunnel-view",
   "description": "simple views on top of megafunnel",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "homepage": "https://github.com/micnews/megafunnel-view",
   "repository": {
     "type": "git",
