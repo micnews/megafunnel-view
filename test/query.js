@@ -44,9 +44,32 @@ tape('create stats query', function (t) {
   t.end()
 })
 
+
+tape('create stats query - legacy', function (t) {
+  var reduce = q.stats({
+    eventName: 'end',
+    duration: true
+  })
+
+  var line = 'end,782,757,0,2300,http://url.com/foo,20300,date,240,,,,,,,,,,0'
+  var line1 = 'end,782,757,0,2300,http://url.com/foo,16300,date,240,,,,,,,,,,0'
+  var line2 = 'end,782,757,0,2300,http://url.com/foo,33300,date,240,,,,,,,,,,0'
+
+  var value = reduce(null, line)
+  t.equal(value.mean, 20300)
+
+  var value1 = reduce(value, line1)
+  t.equal(value.mean, 18300)
+
+  var value2 = reduce(value1, line2)
+  t.equal(value.mean, 23300)
+
+  t.end()
+})
+
+
 tape('create stats query', function (t) {
   var reduce = q.stats({
-    clientName: 'condor',
     eventName: 'end',
     duration: true
   })
