@@ -46,10 +46,10 @@ function query (rule) {
     if('string' === typeof data)
       data = csvLine.decode(data)
     var client = data[0]
-    var m = /\d+\.\d+/.exec(data[1])
+    var m = /^(\d+\.\d+)\.\d+/.exec(data[1])
 
     //1.1 is last version befor columns where added.
-    var version = m ? m[0] : '1.1'
+    var version = m ? m[1] : '1.1'
     var columns = cIndex[version]
 
     //can't process version we do not recognise
