@@ -54,7 +54,7 @@ function query (rule) {
     //can't process version we do not recognise
     if(!columns) return
 
-    var target
+    var target = 1 //set a default value so that row counts work.
     for(var key in rule) {
       var rvalue = rule[key]
       var value = data[columns[key] + 1]
