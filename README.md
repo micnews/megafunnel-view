@@ -58,14 +58,19 @@ To get a realtime feed, use `&tail=true`. You can parse streaming json
 with [JSONStream](https://github.com/dominictarr/JSONStream) although using
 line delimited json is more performant.
 
-### GET /state/{name}
+### get /views
+
+return array of names of all querys
+
+### GET /state/{name}?period={Minutes,Hours,Date,FullYear}
 
 Get a snapshot of the current state of this query. This returns the current
-values for each [period](https://github.com/dominictarr/time-period)
+values for the given [period](https://github.com/dominictarr/time-period),
+if the period is not provided, values for all periods are returned.
 
-### GET /state
+### GET /state?period={Minutes,Hours,Date,FullYear}
 
-get a snapshot for all queries.
+get a snapshot for all queries, with optional period as with `/state/{name}`
 
 ## License
 
