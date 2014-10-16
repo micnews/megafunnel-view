@@ -1,5 +1,9 @@
+function isNumber(n) {
+  return !isNaN(n)
+}
+
 function count (a, b) {
-  if(!a) a = {}
+  if(!a) a = isNumber(b) ? 0 : {}
 
   //treat b as the key
   if('string' === typeof b)
@@ -9,6 +13,8 @@ function count (a, b) {
       a[k] = (a[k] || 0) + b[k]
     }
   }
+  else if(isNumber(b))
+    return a + b
   return a
 }
 
