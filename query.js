@@ -2,6 +2,7 @@ var r = require('./reduce')
 var legacy = require('./legacy')
 var columns = require('condor/columns.json')
 var csvLine = require('csv-line')
+var parserx = require('parse-regexp')
 
 function isString(s) {
   return 'string' === typeof s
@@ -28,10 +29,18 @@ function query (rule) {
 
   var obj = {}
   for(var key in rule) (function (key, value) {
+    var rx
     if(true === value)
       obj[key] = id
+    else if(rx = parserx(value)) {
+      obj[key] = function (value) {
+        var m = rx.exec(value)
+        //match the first group
+        return m && m[1]
+      }
+    }
     else if(/{/.test(value)) { //convert to regular expression
-      var rx = new RegExp(value.replace(/{\w+}/, '(.*)'))
+      rx = new RegExp(value.replace(/{\w+}/, '(.*)'))
       obj[key] = function (value) {
         var m = rx.exec(value)
         return m && m[1]
@@ -45,6 +54,7 @@ function query (rule) {
   return function (data) {
     if('string' === typeof data)
       data = csvLine.decode(data)
+
     var client = data[1]
     var m = /^(\d+\.\d+)\.\d+/.exec(data[2])
 
@@ -55,16 +65,20 @@ function query (rule) {
     if(!columns) return
 
     var target = 1 //set a default value so that row counts work.
-    for(var key in rule) {
-      var rvalue = rule[key]
+
+    for(var key in obj) {
+      var rvalue = obj[key]
       var value = data[columns[key] + 1]
-      if(rvalue === true)
+
+      if(rvalue === true) {
         target = value
+      }
       else if(isString(rvalue)) {
         if(rvalue !== value) return
       }
-      else if(isFunction(rvalue))
+      else if(isFunction(rvalue)) {
         target = rvalue(value)
+      }
     }
     return target
   }
