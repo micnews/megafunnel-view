@@ -72,7 +72,7 @@ module.exports = function (config) {
   }
 
   return http.createServer(stack(
-    route.get(/^\/view\/(\w+)/, function (req, res, next) {
+    route.get(/^\/view\/([\w-_.]+)/, function (req, res, next) {
       var opts = qs.decode(url.parse(req.url).query)
       opts.name = req.params[0]
 
@@ -92,7 +92,7 @@ module.exports = function (config) {
     route.get(/^\/views/, function (req, res, next) {
       res.end(JSON.stringify(Object.keys(tbr.queries), null, 2) + '\n')
     }),
-    route.get(/^\/state\/(\w+)/, function (req, res, next) {
+    route.get(/^\/state\/([\w-_.]+)/, function (req, res, next) {
       var name = req.params[0]
       var query = tbr.queries[name]
       var opts = qs.decode(url.parse(req.url).query)
