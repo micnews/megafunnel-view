@@ -16,6 +16,8 @@ var stringify  = require('pull-stringify')
 var query      = require('./query')
 var createDb   = require('./db')
 
+var version    = require('./package.json').version
+
 module.exports = function (config) {
 
   var db = createDb(config)
@@ -47,7 +49,7 @@ module.exports = function (config) {
 
   for(var name in views) (function (name) {
     var v = views[name]
-    if     (v.stats) v = query.stats(q.stats)
+    if     (v.stats) v = query.stats(v.stats)
     else if(v.count) v = query.count(v.count)
     else
       throw new Error('view may be type "count" or "stats"')
@@ -121,6 +123,9 @@ module.exports = function (config) {
         }, null, 2) + '\n'
       )
 
+    }),
+    route.get(/^\/version$/, function (req, res, next) {
+      res.end(version + '\n')
     })
 //    route.post(/^\/(count|sum)\/(\w+)\//, function (req, res, next) {
 //      var type = req.params[0]
