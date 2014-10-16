@@ -61,15 +61,25 @@ module.exports = function (config) {
 
   var qdb = db.sublevel('queries')
 
+  function filter (q, opts) {
+    var d = q.dump()
+      .filter(function (e) {
+        return e.value != null && (opts.period ? e.type === opts.period : true)
+      })
+    return opts.period ? d[0] : d
+  }
+
   return http.createServer(stack(
     route.get(/^\/view\/(\w+)/, function (req, res, next) {
-      var _url = url.parse(req.url)
-      var opts = qs.decode(_url.query)
+      var opts = qs.decode(url.parse(req.url).query)
       opts.name = req.params[0]
 
       try {
         pull(
           tbr.query(opts),
+          pull.map(function (d) {
+            return {key: d.key[2], value: d.value}
+          }),
           opts.lines ? stringify.lines() : stringify(),
           toPull.sink(res)
         )
@@ -77,20 +87,27 @@ module.exports = function (config) {
         return next(err)
       }
     }),
+    route.get(/^\/views/, function (req, res, next) {
+      res.end(JSON.stringify(Object.keys(tbr.queries), null, 2) + '\n')
+    }),
     route.get(/^\/state\/(\w+)/, function (req, res, next) {
       var name = req.params[0]
       var query = tbr.queries[name]
+      var opts = qs.decode(url.parse(req.url).query)
+
       if(!query)
         return next(new Error('unknown query:'+name))
-      var data = query.dump().filter(function (e) { return e.value != null })
+      var data = filter(query, opts)
+
       res.end(JSON.stringify(data, null, 2) + '\n')
     }),
     route.get(/^\/state/, function (req, res, next) {
+      var opts = qs.decode(url.parse(req.url).query)
       var d = {}
       for(var name in tbr.queries) {
         var q = tbr.queries[name]
         if('function' === typeof q.dump)
-          d[name] = q.dump().filter(function (e) { return e.value != null })
+          d[name] = filter(q, opts)
       }
       res.end(JSON.stringify(d, null, 2) + '\n')
     })
