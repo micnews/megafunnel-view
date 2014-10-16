@@ -110,8 +110,18 @@ module.exports = function (config) {
           d[name] = filter(q, opts)
       }
       res.end(JSON.stringify(d, null, 2) + '\n')
-    })
+    }),
+    route.get(/^\/$/, function (req, res, next) {
+      res.end(
+        JSON.stringify({
+          views: '/views',
+          view: '/view/{name}',
+          viewState: '/state/{name}',
+          allState: '/state'
+        }, null, 2) + '\n'
+      )
 
+    })
 //    route.post(/^\/(count|sum)\/(\w+)\//, function (req, res, next) {
 //      var type = req.params[0]
 //      var name = req.params[1]
