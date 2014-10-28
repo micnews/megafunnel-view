@@ -72,6 +72,68 @@ if the period is not provided, values for all periods are returned.
 
 get a snapshot for all queries, with optional period as with `/state/{name}`
 
+## views/configuration
+
+Currently, views must be entered into the configuration file.
+After editing the file, restart megafunnel-view for the update to take effect.
+If you delete the view db (`rm -rf ~/.megafunnel/viewdb`) then all views
+will be recreated from scratch (for a large dataset this may take a few minutes)
+
+`views` are input as json objects into the config file: `{"views": {[name]: {[type]:query}}}`
+
+
+some example views
+``` js
+//NOTE, comments for explaination,
+//comments are not valid in JSON.
+{
+  "views": {
+    //total clicks, on everything.
+    "clicks": {
+      "count": {
+        "eventName": "click"
+      }
+    },
+    //clicks on page (url)
+    "clicks-by-location": {
+      "count": {
+        "eventName": "click",
+        "location": true
+      }
+    },
+    //average time spent on site.
+    "duration": {
+      "stats": {
+        "eventName": "end",
+        "duration": true
+      }
+    },
+    //total impressions, on everything
+    "load": {
+      "count": {
+        "eventName": "load"
+      }
+    },
+
+    //load, by referrer domain.
+    //this aggregates all links (i.e facebook.com/...) but not their whole url.
+    "load-referrer-domain": {
+      "count": {
+        "eventName": "load",
+        "referrer": "/http:\\/\\/([\\w.]+)/"
+      }
+    },
+    //average time to load the page.
+    "load-stats": {
+      "stats": {
+        "eventName": "load",
+        "duration": true
+      }
+    }
+  }
+}
+```
+
 ## License
 
 MIT
