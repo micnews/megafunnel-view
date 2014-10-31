@@ -21,10 +21,5 @@ var config = {
   logDir: path.join(process.env.HOME, '.megafunnel')
 }
 
-if (argv.config) {
-  var userconfig = require(argv.config)
-  config = xtend(config, userconfig)
-}
-
 module.exports = require('rc')('megafunnel', config);
 
