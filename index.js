@@ -45,7 +45,7 @@ module.exports = function (config) {
   //load views from the config file.
   //(TODO, post views via http)
 
-  var views = config.views
+  var views = config.views || {};
 
   for(var name in views) (function (name) {
     var v = views[name]
@@ -75,6 +75,10 @@ module.exports = function (config) {
     route.get(/^\/view\/([\w-_.]+)/, function (req, res, next) {
       var opts = qs.decode(url.parse(req.url).query)
       opts.name = req.params[0]
+
+      if (!views.hasOwnProperty(opts.name)) {
+        return next(new Error('view does not exist'));
+      }
 
       try {
         pull(
