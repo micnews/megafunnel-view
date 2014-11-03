@@ -64,23 +64,39 @@ function query (rule) {
     //can't process version we do not recognise
     if(!columns) return
 
-    var target = 1 //set a default value so that row counts work.
+    var targets = []
+    var keys = []
 
     for(var key in obj) {
       var rvalue = obj[key]
       var value = data[columns[key] + 1]
 
       if(rvalue === true) {
-        target = value
+        targets.push(value);
+        keys.push(key);
       }
       else if(isString(rvalue)) {
         if(rvalue !== value) return
       }
       else if(isFunction(rvalue)) {
-        target = rvalue(value)
+        targets.push(rvalue(value));
+        keys.push(key);
       }
     }
-    return target
+
+    switch (targets.length) {
+      case 0:
+        //set a default value so that row counts work
+        return 1
+      case 1:
+        return targets[0]
+      default:
+        var result = {}
+        for (var i = 0, l = targets.length; i < l; ++i) {
+          result[keys[i]] = targets[i]
+        }
+        return JSON.stringify(result)
+    }
   }
 }
 
